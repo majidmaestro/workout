@@ -1,5 +1,6 @@
 from flask import Flask, make_response
 from flask_migrate import Migrate
+from schemas import WorkoutSchema
 
 from models import *
 
@@ -10,11 +11,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 migrate = Migrate(app, db)
 
 db.init_app(app)
+workout_schema = WorkoutSchema()
+workouts_schema = WorkoutSchema(many=True)
 
 # Define Routes here
 @app.route('/workouts', methods=['GET'])
 def get_workouts():
-    return make_response({}, 200)
+    workout = Workout.query.all()
+    data = workouts_schema.dump(workout)
+    return make_response(data, 200)
 
 @app.route('/workouts/<int:id>', methods=['GET'])
 def get_workout(id):

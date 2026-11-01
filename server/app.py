@@ -23,7 +23,11 @@ def get_workouts():
 
 @app.route('/workouts/<int:id>', methods=['GET'])
 def get_workout(id):
-    return make_response({}, 200)
+    workout = Workout.query.filter_by(id=id).first()
+    if workout is None:
+        return make_response({"error": "Workout not found"}, 404)
+    data = workout_schema.dump(workout)
+    return make_response(data, 200)
 
 @app.route('/workouts', methods=['POST'])
 def create_workout():

@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
-from datetime import datetime
 from sqlalchemy.ext.associationproxy import association_proxy
 db = SQLAlchemy()
 
@@ -38,6 +37,12 @@ class Workout(db.Model):
     workout_exercises = db.relationship('WorkoutExercise', back_populates='workout')
     exercises = association_proxy('workout_exercises', 'exercise')
 
+    @validates('duration_minutes')
+    def validate_duration_minutes(self, key, value):
+        if value is None or value <= 0:
+            raise ValueError("Duration minutes must be positive integer.")
+        return value
+
 class WorkoutExercise(db.Model):
     __tablename__ = 'workout_exercises'
     __table_args__ = (
@@ -52,10 +57,13 @@ class WorkoutExercise(db.Model):
     workout = db.relationship('Workout', back_populates='workout_exercises')
     exercise = db.relationship('Exercise', back_populates='workout_exercises')
 
-    @validates('reps', 'duration_seconds')
+    @validates('reps', 'duration_seconds', 'sets')
     def validate_reps_duration(self, key, value):
         if key == 'reps' and value is not None and value <= 0:
             raise ValueError("Reps must be positive integer.")
         if key == 'duration_seconds' and value is not None and value <= 0:
             raise ValueError("Duration seconds must be positive integer.")
+        if key == 'sets' and value is not None and value <= 0:
+            raise ValueError("Sets must be positive integer.")
         return value
+        

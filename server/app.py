@@ -15,7 +15,7 @@ db.init_app(app)
 workout_schema = WorkoutSchema()
 workouts_schema = WorkoutSchema(many=True, exclude=['workout_exercises'])
 exercise_schema = ExerciseSchema()
-exercises_schema = ExerciseSchema(many=True)
+exercises_schema = ExerciseSchema(many=True, exclude=['workouts'])
 
 # Define Routes here
 @app.route('/workouts', methods=['GET'])

@@ -5,6 +5,7 @@ class ExerciseSchema(Schema):
     name = fields.Str(required=True, validate=validate.Length(min=1))
     category = fields.Str(required=True, validate=validate.Length(min=1))
     equipment_needed = fields.Bool(required=True)
+    workouts = fields.Nested('WorkoutSchema', many=True, dump_only=True, exclude=['workout_exercises'])
 
 class WorkoutExerciseSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -13,7 +14,7 @@ class WorkoutExerciseSchema(Schema):
     sets = fields.Int(allow_none=True)
     reps = fields.Int(allow_none=True)
     duration_seconds = fields.Int(allow_none=True)
-    exercise = fields.Nested(ExerciseSchema, dump_only=True)
+    exercise = fields.Nested(ExerciseSchema, dump_only=True, exclude=['workouts'])
 
 class WorkoutSchema(Schema):
     id = fields.Int(dump_only=True)

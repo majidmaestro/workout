@@ -16,6 +16,7 @@ workout_schema = WorkoutSchema()
 workouts_schema = WorkoutSchema(many=True, exclude=['workout_exercises'])
 exercise_schema = ExerciseSchema()
 exercises_schema = ExerciseSchema(many=True, exclude=['workouts'])
+workout_exercise_schema = WorkoutExerciseSchema()
 
 # Define Routes here
 @app.route('/workouts', methods=['GET'])
@@ -90,7 +91,20 @@ def delete_exercise(id):
 
 @app.route('/workouts/<int:workout_id>/exercises/<int:exercise_id>/workout_exercises', methods=['POST'])
 def create_workout_exercise(workout_id, exercise_id):
-    return make_response({}, 201)
+    workout = Workout.query.filter_by(id=workout_id).first()
+    exercise = Exercise.query.filter_by(id=exercise_id).first()
+    if workout is None or exercise is None:
+        return make_response({"error": "Workout or Exercise not found"}, 404)
+
+    try:
+        data = workout_exercise_schema.load(request.get_json())
+    except ValidationError as err:
+        return make_response({"errors": err.messages}, 400)
+    
+    workout_exercise = WorkoutExercise(workout_id=workout_id, exercise_id=exercise_id, **data)
+    db.session.add(workout_exercise)
+    db.session.commit()
+    return make_response(workout_exercise_schema.dump(workout_exercise), 201)
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

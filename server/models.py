@@ -10,7 +10,7 @@ class Exercise(db.Model):
     name = db.Column(db.String, nullable=False, unique=True)
     category = db.Column(db.String, nullable=False)
     equipment_needed = db.Column(db.Boolean, nullable=False)
-    workout_exercises = db.relationship('WorkoutExercise', back_populates='exercise')
+    workout_exercises = db.relationship('WorkoutExercise', back_populates='exercise', cascade='all, delete-orphan')
     workouts = association_proxy('workout_exercises', 'workout')
 
     @validates('name')
@@ -34,7 +34,7 @@ class Workout(db.Model):
     date = db.Column(db.Date, nullable=False)
     duration_minutes = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.Text)
-    workout_exercises = db.relationship('WorkoutExercise', back_populates='workout')
+    workout_exercises = db.relationship('WorkoutExercise', back_populates='workout', cascade='all, delete-orphan')
     exercises = association_proxy('workout_exercises', 'exercise')
 
     @validates('duration_minutes')
